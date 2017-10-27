@@ -24,7 +24,7 @@ std::string OTPEngine::decode(const std::string &str){
 
     std::string finalString = str; // Pull str (text to decode) object into finalString
 
-    for(int i = 0;i < str.size();++i){ // Loop through the string
+    for(unsigned int i = 0;i < str.size();++i){ // Loop through the string
         finalString[i] = (char)str[i] - (*_current)[i]; // Subtract OTP values from text values
     }
 
@@ -36,7 +36,7 @@ std::string OTPEngine::encode(const std::string &str){
 
     std::string finalString = str; //Copy str (text to decode) into finalString object, for later encoding
 
-    for(int i = 0;i < str.size();++i){
+    for(unsigned int i = 0;i < str.size();++i){
         finalString[i] = (char)str[i] + (*_current)[i]; // Add (i) OTP value to the (i)th char, resulting in a new char
     }
 
@@ -58,11 +58,6 @@ int OTPEngine::encodeFile(const std::string &path){
         finalContents += (char)(currentChar + (*_current)[_read->tellg()]); // Encrypt the current character and add it to the final string
     }
 
-    int fileSize = _read->tellg(); // Get size of file in bytes.
-
-    //_read->seekg(0,std::ios::cur);
-    int finalCharAmount = _read->tellg(); // Variable to store the final amount of encrypted characters.
-
     _read->close(); // Close file-reading
 
     /* Writing new contents to file */
@@ -82,7 +77,6 @@ int OTPEngine::decodeFile(const std::string &path){
 
     std::string newContent = ""; // Variable to store new file content.
     char currentChar; // Character to store current character being read by file stream.
-    unsigned int currentIndex = 0; // Current character in file.
 
     while(_read->get(currentChar)){ // While there's more of the file to read,
         newContent += (char)((int)currentChar - (*_current)[_read->tellg()]); // Decode current character and add it to final string
