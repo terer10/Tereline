@@ -1,6 +1,9 @@
 #ifndef ONETIMEPAD_H
 #define ONETIMEPAD_H
 #include <iostream>
+#include <iomanip>
+#include <limits>
+
 #include <exception>
 #include <sstream>
 #include <memory>
@@ -8,10 +11,11 @@
 #include <fstream>
 
 #include "../make_unique.h"
+#include "../FileSystem.h"
 
 #include "../Random.h"
 
-typedef std::vector<char> OneTimePad;
+typedef std::vector<int> OneTimePad;
 
 class OTPEngine{
     public:
@@ -20,38 +24,47 @@ class OTPEngine{
          * min: minimum number RNG can generate
          * max: maximum number RNG can generate
         **/
-        OTPEngine(unsigned int min = 0,unsigned int max = 100);
+        OTPEngine(unsigned int min = 0,unsigned int max = 255);
 
         /** Generate new OneTimePad
          * length: length of OTP
         **/
         void reroll(int length);
 
-        /** Decode text based on current OTP
-         * str: text to decode
-        **/
-        std::string decode(const std::string &str);
+        int rerollForFile(const std::string &path);
 
-        /** Encode text based on current OTP
-         * str: text to encode
+        /** decrypt text based on current OTP
+         * str: text to decrypt
         **/
-        std::string encode(const std::string &str);
+        std::string decrypt(const std::string &str);
 
-        /** Encode file based on current OTP
-         * str: path of file to encode
+        /** encrypt text based on current OTP
+         * str: text to encrypt
         **/
-        int encodeFile(const std::string &path);
+        std::string encrypt(const std::string &str);
 
-        /** Encode file based on current OTP
-         * str: path of file to decode
+        /** encrypt file based on current OTP
+         * str: path of file to encrypt
         **/
-        int decodeFile(const std::string &path);
+        int encryptFile(const std::string &path);
+
+        /** encrypt file based on current OTP
+         * str: path of file to decrypt
+        **/
+        int decryptFile(const std::string &path);
+
+
+        int import(const std::string &content);
+
+        int importFromFile(const std::string &path);
+
+        int exportToFile(const std::string &path,bool overwrite = false);
 
         /** Return _string object **/
         const std::string &getString();
 
         /** Return current OTP **/
-        const std::vector<char> &getCurrentValues();
+        const OneTimePad &getCurrentValues();
 
         /** Save current pad to _pads map
          * name: name to save pad to
@@ -64,12 +77,12 @@ class OTPEngine{
         int loadFromCache(const std::string &str);
 
         virtual ~OTPEngine();
-    private:
+    protected:
 
         /** Update pad string to contain current OTP characters **/
         void updateString();
 
-    private:
+    protected:
 
         std::shared_ptr<OneTimePad> _current;
 
@@ -90,4 +103,21 @@ class OTPEngine{
         std::map<std::string,std::shared_ptr<OneTimePad>> _pads;
 };
 
+
+
+class BasicOTPEngine : public OTPEngine{
+    public:
+        std::string decrypt(const std::string &str);
+        std::string encrypt(const std::string &str);
+
+        /** encrypt file based on current OTP
+         * str: path of file to encrypt
+        **/
+        int encryptFile(const std::string &path);
+
+        /** encrypt file based on current OTP
+         * str: path of file to decrypt
+        **/
+        int decryptFile(const std::string &path);
+};
 #endif // ONETIMEPAD_H
